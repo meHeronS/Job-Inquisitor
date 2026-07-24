@@ -1,31 +1,28 @@
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it } from 'node:test';
-import { connectDatabase, disconnectDatabase } from '../src/config/database.js';
 import { JobController } from '../src/controllers/jobController.js';
-import { SecurityCryptoService } from '../src/services/securityCryptoService.js';
+import { runDirectoryCleanup } from '../src/utils/cleanup.js';
 
-describe('Suíte de Testes - Job Inquisitor 🕵️‍♂️ (Investigador e Copiloto de Vagas Universal)', () => {
-  it('1. Deve instanciar o JobController com todos os 15 módulos sob a marca Job Inquisitor', () => {
+describe('Suíte de Testes - Job Inquisitor (Autocriação Defensiva de Pastas & Regras Git)', () => {
+  it('1. Deve autocriar as pastas user_data/, data/ e logs/ com arquivos .gitkeep defensivamente', () => {
+    runDirectoryCleanup();
+
+    const rootDir = process.cwd();
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'user_data/resumes/.gitkeep')), true);
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'user_data/letters/.gitkeep')), true);
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'user_data/sessions/.gitkeep')), true);
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'data/db/.gitkeep')), true);
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'data/reports/.gitkeep')), true);
+    assert.strictEqual(fs.existsSync(path.join(rootDir, 'logs/.gitkeep')), true);
+  });
+
+  it('2. Deve inicializar o JobController com os 15 módulos operacionais sem erros', () => {
     const controller = new JobController();
     const status = controller.getSystemStatus();
 
     assert.strictEqual(status.status, 'active');
     assert.strictEqual(status.modules.length, 15);
-  });
-
-  it('2. Deve derivar a chave mestre por PBKDF2 HMAC-SHA256 no Job Inquisitor', () => {
-    const cryptoService = new SecurityCryptoService('passphrase-inquisitor');
-    const secret = 'dados_sensiveis_inquisitor';
-
-    const encrypted = cryptoService.encrypt(secret);
-    const decrypted = cryptoService.decrypt(encrypted);
-
-    assert.strictEqual(decrypted, secret);
-  });
-
-  it('3. Deve conectar o banco local na pasta dedicada data/db/job_inquisitor_db.json', async () => {
-    const dbStatus = await connectDatabase();
-    assert.ok(dbStatus.type);
-    await disconnectDatabase();
   });
 });

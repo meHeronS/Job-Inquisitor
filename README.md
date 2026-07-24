@@ -2,21 +2,13 @@
 
 > **Investigador & Copiloto de Vagas Automático Universal** - Ferramenta open-source universal, **100% GRATUITA**, compatível com **Linux, Windows e macOS**, com relatórios ultra-enxutos otimizados para aplicação em massa (50+ candidaturas/dia), criptografia militar PBKDF2 + AES-256-GCM com chave derivada de hardware, baixo consumo de RAM/CPU (< 1.2 GB RAM), suporte a Google One-Tap e Microsoft Outlook OAuth 2.0, busca em 12 portais + "Trabalhe Conosco" direto para **qualquer área profissional**.
 > 
-> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.1` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md)
+> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.2` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md)
 
 ---
 
-## ⚖️ Conformidade Legal, Ética e LGPD (Compliance)
+## 🏛️ Fundamentação Técnica & Disciplinas de Ciência da Computação
 
-O **Job Inquisitor 🕵️‍♂️** foi projetado seguindo rigorosamente as diretrizes da **LGPD (Lei Geral de Proteção de Dados - Lei 13.709/2018)** e as melhores práticas éticas da indústria de software:
-
-1. **Privacidade Absoluta (LGPD Compliance):** Nenhum dado pessoal do candidato (currículos, e-mails, histórico salarial ou tokens) é enviado para servidores remotos na nuvem. Todos os dados permanecem mantidos **100% no dispositivo local do usuário** e criptografados em repouso com **AES-256-GCM**.
-2. **Raspagem Ética e Transparente (Ethical Web Scraping):** O robô consulta exclusivamente **anúncios públicos de vagas** disponibilizados abertamente pelas empresas para atração de talentos. Operações de varredura executam com controle de vazão no BullMQ e delays humanizados (3s a 8s), respeitando os servidores das plataformas.
-3. **Isenção de Responsabilidade Open-Source (MIT License):** O software é distribuído sob a licença open-source MIT ("AS IS"), sem garantias implícitas, garantindo respaldo jurídico ao autor e desenvolvedores.
-
----
-
-## 🏛️ Mapeamento de Disciplinas de Ciência da Computação & SDLC
+O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura detalhando **onde, como e por que** cada grande disciplina da Ciência da Computação foi empregada. Veja o documento completo em [docs/ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md).
 
 | Disciplina da Ciência da Computação | Onde se Aplica no Projeto | Tecnologias / Conceitos Utilizados |
 | :--- | :--- | :--- |
@@ -35,6 +27,14 @@ O **Job Inquisitor 🕵️‍♂️** foi projetado seguindo rigorosamente as di
 > *Este projeto foi arquitetado e desenvolvido através de **Engenharia Pareada com Inteligência Artificial (Agentic AI Coding)** em colaboração com Antigravity (Google DeepMind Team).*
 > 
 > A solução combina princípios rígidos de **Engenharia de Software (Clean Code, SOLID, TDD, ES Modules, Criptografia AES-256-GCM em Repouso)** com o poder de **Modelos de Linguagem Locais (Ollama)** e **RPA com Playwright**.
+
+---
+
+## ⚖️ Conformidade Legal, Ética e LGPD (Compliance)
+
+1. **Privacidade Absoluta (LGPD Compliance - Lei 13.709/2018):** Nenhum dado pessoal do candidato é enviado para a nuvem. Todos os dados permanecem **100% no dispositivo local do usuário** e criptografados em repouso.
+2. **Raspagem Ética:** A varredura consulta exclusivamente **anúncios públicos de vagas**, utilizando controle de vazão no BullMQ e delays humanizados (3s a 8s).
+3. **Isenção de Responsabilidade Open-Source:** Software sob licença MIT ("AS IS"), respaldando o autor e colaboradores.
 
 ---
 
@@ -94,18 +94,6 @@ O **Job Inquisitor** varre 12 grandes agregadores de vagas e descobre autonomame
 
 ---
 
-## 📊 Relatório Ultra-Enxuto para Alta Escala (3 Linhas)
-
-O relatório gerado no terminal e salvo no arquivo `data/reports/LISTA_VIP_VAGAS.md`:
-
-```text
-🎯 [85% Match] Candidatar | ✅ Vaga Legítima Mapeada
-💡 Gatilho RH: Experiência direta aplicável para a posição de Analista na empresa.
-💰 Pretensão Salarial: CLT: R$ 4.500 - R$ 7.500 | PJ: R$ 6.750 - R$ 11.250
-```
-
----
-
 ## 📁 Estrutura do Repositório 100% Limpa
 
 ```
@@ -118,6 +106,10 @@ Job-Inquisitor/
 │   ├── db/                   # Arquivo do Banco Local (job_inquisitor_db.json)
 │   └── reports/              # Relatório exportado da Lista VIP (LISTA_VIP_VAGAS.md)
 ├── docs/                     # 📖 DOCUMENTAÇÃO PÚBLICA DO REPOSITÓRIO GITHUB
+│   ├── ARCHITECTURE_SDLC.md # 🏛️ Guia Técnico de Arquitetura & Disciplinas da Ciência da Computação
+│   ├── OLLAMA_GUIDE.md       # Guia da IA Local 100% Gratuita (Ollama)
+│   ├── README.md             # Guia explicativo da pasta docs
+│   └── resume_template.md    # Modelo público de currículo de exemplo
 ├── logs/                     # 📝 [GIT-IGNORED] Logs de auditoria da varredura (app.log)
 ├── tests/                    # 🧪 Suíte de testes unitários automatizados (health.test.js)
 ├── CITATION.cff              # 📌 Arquivo Padrão de Citação no GitHub

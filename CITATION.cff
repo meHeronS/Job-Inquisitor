@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "Se você utilizar o Job Inquisitor em seus projetos ou pesquisas, por favor cite conforme abaixo."
+title: "Job Inquisitor: Investigador & Copiloto de Vagas Automático Universal"
+abstract: "Ferramenta open-source universal para investigação autônoma de vagas, pré-preenchimento de formulários, cálculo de pretensão salarial e triagem com RH/ATS."
+authors:
+  - family-names: "Vieira da Silva"
+    given-names: "Heron Victor"
+    alias: "meherons"
+    website: "https://www.linkedin.com/in/heron-silva/"
+repository-code: "https://github.com/meherons/Job-Inquisitor"
+license: MIT
+version: 1.0.1
+date-released: 2026-07-23
+keywords:
+  - "job search"
+  - "ai copilot"
+  - "ollama"
+  - "playwright"
+  - "automation"
+  - "open-source"

@@ -10,17 +10,27 @@ secrets.json
 *.pem
 *.key
 
-# Pastas de Dados Privados do Usuário (NUNCA SUBIR PARA O GITHUB)
-user_data/
+# Estrutura de Pastas Privadas (Manter Pastas via .gitkeep no GitHub, Bloquear Conteúdo Privado)
+user_data/*
+!user_data/**/.gitkeep
+!user_data/resumes/
+!user_data/letters/
+!user_data/sessions/
+
+# Arquivos sensíveis do usuário
 *.pdf
 *.docx
 *.doc
 
-# Banco de Dados Local & Relatórios Gerados pelo Sistema (NUNCA SUBIR PARA O GITHUB)
-data/
+# Banco de Dados Local & Relatórios Gerados pelo Sistema (Manter Pastas via .gitkeep, Bloquear Arquivos)
+data/*
+!data/**/.gitkeep
+!data/db/
+!data/reports/
 
 # Logs de Auditoria do Sistema
-logs/
+logs/*
+!logs/**/.gitkeep
 *.log
 npm-debug.log*
 
