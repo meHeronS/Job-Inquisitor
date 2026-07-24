@@ -1,0 +1,42 @@
+# Node.js dependencies
+node_modules/
+
+# Environment & Secrets (NUNCA SUBIR PARA O GITHUB)
+.env
+.env.local
+.env.*.local
+credentials.json
+secrets.json
+*.pem
+*.key
+
+# Pastas de Dados Privados do Usuário (NUNCA SUBIR PARA O GITHUB)
+user_data/
+*.pdf
+*.docx
+*.doc
+
+# Banco de Dados Local & Relatórios Gerados pelo Sistema (NUNCA SUBIR PARA O GITHUB)
+data/
+
+# Logs de Auditoria do Sistema
+logs/
+*.log
+npm-debug.log*
+
+# Playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker data persistence (local)
+.data/
+mongo_data/
+redis_data/
