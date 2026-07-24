@@ -8,7 +8,7 @@
 
 ## 🏛️ Fundamentação Técnica & Disciplinas de Ciência da Computação
 
-O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura detalhando **onde, como e por que** cada grande disciplina da Ciência da Computação foi empregada. Veja o documento completo em [docs/ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md).
+O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura detalhando **onde, como e por que** cada grande disciplina da Ciência da Computação foi empregada. Veja o documento em [docs/ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md).
 
 | Disciplina da Ciência da Computação | Onde se Aplica no Projeto | Tecnologias / Conceitos Utilizados |
 | :--- | :--- | :--- |
@@ -101,7 +101,8 @@ Job-Inquisitor/
 ├── user_data/                # 🔒 [GIT-IGNORED] DADOS PRIVADOS DO USUÁRIO
 │   ├── resumes/              # Seus currículos reais em PDF
 │   ├── letters/              # Cartas de apresentação em PDF
-│   └── sessions/             # Tokens OAuth e sessão do navegador (session_state.json)
+│   ├── sessions/             # Tokens OAuth e sessão do navegador (session_state.json)
+│   └── GIT_BRANCHING_GUIDE.md# 🌿 Seu Guia de Estudo Local de Branches
 ├── data/                     # 🗄️ [GIT-IGNORED] BANCO DE DADOS & RELATÓRIOS DO SISTEMA
 │   ├── db/                   # Arquivo do Banco Local (job_inquisitor_db.json)
 │   └── reports/              # Relatório exportado da Lista VIP (LISTA_VIP_VAGAS.md)

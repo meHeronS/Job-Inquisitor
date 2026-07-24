@@ -1,52 +1,49 @@
-# Node.js dependencies
+# Node.js
 node_modules/
+npm-debug.log
+yarn-error.log
 
-# Environment & Secrets (NUNCA SUBIR PARA O GITHUB)
+# Environment
 .env
 .env.local
-.env.*.local
-credentials.json
-secrets.json
-*.pem
-*.key
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Estrutura de Pastas Privadas (Manter Pastas via .gitkeep no GitHub, Bloquear Conteúdo Privado)
-user_data/*
-!user_data/**/.gitkeep
-!user_data/resumes/
-!user_data/letters/
-!user_data/sessions/
+# Build / Output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
 
-# Arquivos sensíveis do usuário
-*.pdf
-*.docx
-*.doc
-
-# Banco de Dados Local & Relatórios Gerados pelo Sistema (Manter Pastas via .gitkeep, Bloquear Arquivos)
-data/*
-!data/**/.gitkeep
-!data/db/
-!data/reports/
-
-# Logs de Auditoria do Sistema
-logs/*
-!logs/**/.gitkeep
-*.log
-npm-debug.log*
-
-# Playwright artifacts
-test-results/
-playwright-report/
-blob-report/
-playwright/.cache/
-
-# IDE & OS
+# Editor / OS
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 .DS_Store
 Thumbs.db
 
-# Docker data persistence (local)
-.data/
-mongo_data/
-redis_data/
+# Logs and Temporaries
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Job Inquisitor Security (IMPORTANT: We track directories with .gitkeep but ignore files)
+# Ignore all files inside user_data, data, and logs, EXCEPT .gitkeep
+user_data/*
+!user_data/.gitkeep
+data/*
+!data/.gitkeep
+logs/*
+!logs/.gitkeep
+tests/logs/*
+!tests/logs/.gitkeep
+
+# Mocks e Datasets Locais de Teste (Não subir massa de dados)
+tests/mocks/*.json

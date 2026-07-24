@@ -13,6 +13,7 @@ import { SalaryBenchmarkService } from '../services/salaryBenchmarkService.js';
 import { ScrapingService } from '../services/scrapingService.js';
 import { SecurityCryptoService } from '../services/securityCryptoService.js';
 import { SessionManagerService } from '../services/sessionManagerService.js';
+import { ApplicationTrackingService } from '../services/applicationTrackingService.js';
 import { runDirectoryCleanup } from '../utils/cleanup.js';
 
 /**
@@ -23,7 +24,9 @@ export class JobController {
   constructor(
     matchService = new MatchService(),
     scrapingService = new ScrapingService(),
-    emailService = new EmailService(),
+    securityCryptoService = new SecurityCryptoService(),
+    applicationTrackingService = new ApplicationTrackingService(),
+    emailService = new EmailService([], securityCryptoService, applicationTrackingService),
     pdfReaderService = new PdfReaderService(),
     llmService = new LLMService(),
     salaryBenchmarkService = new SalaryBenchmarkService(),
@@ -34,8 +37,7 @@ export class JobController {
     formAutofillService = new FormAutofillService(),
     companyCareerPageService = new CompanyCareerPageService(),
     deduplicationService = new DeduplicationService(),
-    reportExportService = new ReportExportService(),
-    securityCryptoService = new SecurityCryptoService()
+    reportExportService = new ReportExportService()
   ) {
     // Executa a limpeza física e migração de diretórios obsoletos na inicialização
     try {
@@ -46,6 +48,8 @@ export class JobController {
 
     this.matchService = matchService;
     this.scrapingService = scrapingService;
+    this.securityCryptoService = securityCryptoService;
+    this.applicationTrackingService = applicationTrackingService;
     this.emailService = emailService;
     this.pdfReaderService = pdfReaderService;
     this.llmService = llmService;
@@ -58,7 +62,6 @@ export class JobController {
     this.companyCareerPageService = companyCareerPageService;
     this.deduplicationService = deduplicationService;
     this.reportExportService = reportExportService;
-    this.securityCryptoService = securityCryptoService;
   }
 
   encryptData(plainText) {
