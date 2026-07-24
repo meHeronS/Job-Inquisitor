@@ -48,8 +48,8 @@ export const config = {
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
   },
   llm: {
-    baseUrl: process.env.LLM_BASE_URL || 'http://localhost:11434',
-    model: process.env.LLM_MODEL || 'llama3.2:3b',
+    baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+    model: process.env.OLLAMA_MODEL || 'llama3.2:3b' // Atualizado para o modelo de alta performance sugerido
   },
   emailAccounts: parseEmailAccounts(),
 };

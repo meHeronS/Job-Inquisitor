@@ -1,5 +1,9 @@
 # Job Inquisitor 🕵️‍♂️
 
+<div align="center">
+  <img src="docs/logo.png" alt="Job Inquisitor Logo" width="300"/>
+</div>
+
 ```text
       _       _       ___                  _     _ _
      | | ___ | |__   |_ _|_ __   __ _ _   _(_)___(_) |_ ___  __
@@ -18,7 +22,7 @@
 
 > **Investigador & Copiloto de Vagas Automático Universal** - Ferramenta open-source universal, **100% GRATUITA**, compatível com **Linux, Windows e macOS**, com relatórios ultra-enxutos otimizados para aplicação em massa (50+ candidaturas/dia), criptografia militar PBKDF2 + AES-256-GCM com chave derivada de hardware, baixo consumo de RAM/CPU (< 1.2 GB RAM), suporte a Google One-Tap e Microsoft Outlook OAuth 2.0, busca em 12 portais + "Trabalhe Conosco" direto para **qualquer área profissional**.
 > 
-> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.3` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md)
+> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.3` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [architecture-sdlc.md](docs/architecture-sdlc.md)
 
 ---
 
@@ -36,7 +40,7 @@ Além da raspagem e automação tradicionais, o Job Inquisitor implementa um cic
 
 ## 🏛️ Fundamentação Técnica & Disciplinas de Ciência da Computação
 
-O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura detalhando **onde, como e por que** cada grande disciplina da Ciência da Computação foi empregada. Veja o documento em [docs/ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md).
+O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura detalhando **onde, como e por que** cada grande disciplina da Ciência da Computação foi empregada. Veja o documento em [docs/architecture-sdlc.md](docs/architecture-sdlc.md).
 
 | Disciplina da Ciência da Computação | Onde se Aplica no Projeto | Tecnologias / Conceitos Utilizados |
 | :--- | :--- | :--- |
@@ -58,6 +62,12 @@ O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura det
 
 ---
 
+## 🤝 Como Contribuir
+
+O **Job Inquisitor** é um projeto mantido com padrões estritos de arquitetura de software. Se você é um desenvolvedor e quer nos ajudar a melhorar o ecossistema (seja com integrações de novos portais, melhorias na IA ou correções de bugs), leia o nosso **[Guia de Contribuição (CONTRIBUTING.md)](CONTRIBUTING.md)** antes de abrir um Pull Request.
+
+---
+
 ## ⚖️ Conformidade Legal, Ética e LGPD (Compliance)
 
 1. **Privacidade Absoluta (LGPD Compliance - Lei 13.709/2018):** Nenhum dado pessoal do candidato é enviado para a nuvem. Todos os dados permanecem **100% no dispositivo local do usuário** e criptografados em repouso.
@@ -66,40 +76,38 @@ O **Job Inquisitor 🕵️‍♂️** possui um guia completo de arquitetura det
 
 ---
 
-## 🚀 Guia Passo a Passo da Primeira Execução (Quickstart)
+## 🚀 Guia de Instalação Rápida (1-Click Bootstrapper)
 
-### 1️⃣ Passo 1: Adicionar seu Currículo
-Copie seu currículo em PDF para a pasta privada do projeto:
-```bash
-user_data/resumes/
-```
-*(Se tiver uma carta de apresentação em PDF, coloque em `user_data/letters/`)*
+O Job Inquisitor foi desenhado para ser acessível a qualquer usuário final. Todo o processo de instalação do **Node.js**, **Bibliotecas NPM** e do **Motor Semântico de IA (Ollama)** foi 100% automatizado em scripts nativos.
 
-### 2️⃣ Passo 2: Instalar Dependências (Primeira vez)
-No terminal da pasta do projeto, rode:
-```bash
-npm install
-```
+### 💻 Para usuários de Windows
+1. Baixe o repositório e extraia a pasta.
+2. Dê um duplo clique no arquivo **`Job-Inquisitor-Windows.bat`**.
+3. O script verificará as dependências, instalará tudo automaticamente via *Winget* (Nativo do Windows), **baixará o modelo oficial de IA (Llama 3.2)** e inicializará o ecossistema na sua tela.
 
-### 3️⃣ Passo 3: Garantir Estrutura de Pastas e Testes
-Garante que todas as pastas privadas estão ativas e os 15 módulos validados:
-```bash
-npm run clean-dirs
-npm test
-```
+### 🐧🍎 Para usuários de Linux e macOS
+1. Abra seu terminal na pasta do projeto.
+2. Dê permissão de execução para o instalador:
+   ```bash
+   chmod +x Job-Inquisitor-Linux-Mac.sh
+   ```
+3. Execute o inicializador:
+   ```bash
+   ./Job-Inquisitor-Linux-Mac.sh
+   ```
+4. O script instalará o Node.js (`apt`/`brew`), o Ollama (`curl`), **baixará o modelo oficial de IA (Llama 3.2)** e fará o boot automático do sistema.
 
-### 4️⃣ Passo 4: Opcional - Ativar IA Local Gratuita (Ollama)
-Se quiser relatórios gerados por IA Local (ou pule para usar o motor nativo grátis):
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama run qwen2.5:1.5b
-```
+*(Para engenheiros de software que já possuem o Node.js e o Ollama configurados localmente: basta rodar `ollama pull llama3.2:3b` para garantir o modelo, e depois utilizar o fluxo tradicional `npm install` seguido de `npm start`).*
 
-### 5️⃣ Passo 5: Iniciar o Job Inquisitor 🕵️‍♂️
-Rode o comando no seu terminal para abrir a interface do copiloto:
-```bash
-npm start
-```
+---
+
+## 💻 Requisitos Mínimos (Otimizado para Escritório)
+
+O motor de Inteligência Artificial do Job Inquisitor foi explicitamente reescrito e otimizado na camada da API (Modo de Baixo Consumo) para operar de forma segura em computadores de entrada ou hardwares legados, sem congelar o sistema operacional ou superaquecer os componentes físicos.
+
+- **Processador:** Qualquer CPU (Intel Celeron, Core i3 antigo, Pentium). O sistema força o uso de **apenas 1 Thread (Núcleo)** do processador para IA, mantendo o restante da sua máquina totalmente livre para você continuar trabalhando ou assistindo Netflix sem travamentos.
+- **Placa de Vídeo (GPU):** Nenhuma necessária. O sistema desabilita o uso de GPU ativamente para evitar mineração de hardware em notebooks de trabalho.
+- **Memória RAM:** 4 GB. O sistema mastiga documentos usando uma arquitetura *Map-Reduce (Chunking)*. Ao invés de tentar ler tudo de uma vez e estourar a memória RAM, ele quebra os dados em pedaços microscópicos de 5000 caracteres, consumindo ridículos ~500MB a 1GB de RAM durante a geração.
 
 ---
 
@@ -137,10 +145,9 @@ Job-Inquisitor/
 │   ├── applications.json     # Banco de Dados Kanban do ATS (Seu Trello de Vagas)
 │   └── reports/              # Relatório exportado da Lista VIP (LISTA_VIP_VAGAS.md)
 ├── docs/                     # 📖 DOCUMENTAÇÃO PÚBLICA DO REPOSITÓRIO GITHUB
-│   ├── ARCHITECTURE_SDLC.md # 🏛️ Guia Técnico de Arquitetura & Disciplinas da Ciência da Computação
-│   ├── OLLAMA_GUIDE.md       # Guia da IA Local 100% Gratuita (Ollama)
-│   ├── README.md             # Guia explicativo da pasta docs
-│   └── resume_template.md    # Modelo público de currículo de exemplo
+│   ├── architecture-sdlc.md  # 🏛️ Guia Técnico de Arquitetura & Disciplinas da Ciência da Computação
+│   ├── ollama-guide.md       # Guia da IA Local 100% Gratuita (Ollama)
+│   └── resume-template.md    # Modelo público de currículo de exemplo
 ├── logs/                     # 📝 [GIT-IGNORED] Logs de auditoria da varredura (app.log)
 ├── tests/                    # 🧪 Suíte de testes unitários automatizados (health.test.js)
 ├── CITATION.cff              # 📌 Arquivo Padrão de Citação no GitHub

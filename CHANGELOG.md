@@ -14,8 +14,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Quarentena de Vagas (Prevenção de Falsos Positivos):** Vagas bloqueadas pela IA por suspeita de toxicidade não são mais descartadas. Elas vão para a Quarentena e podem ser revisadas/anuladas pelo usuário através do CLI.
 - **Ghost Writer / Copiloto de Chat:** Adição do módulo interativo no CLI (`💬 Chat: Copiloto Interativo`). O LLM assume a persona do candidato (com base no currículo e Tom de Voz extraídos) para responder perguntas de formulários (ex: Gupy, Inhire) em primeira pessoa, mantendo uma regra estrita "Anti-IA" (sem jargões e formatação clichê).
 - **Extração de Perfil Avançado 360º:** O `LLMService` agora extrai 5 tamanhos de resumos (`micro`, `short`, `medium`, `long`, `extraLong`), feedback para ATS (`atsImprovements`), e personalidade (`toneOfVoice`).
-- **Teste de Integração (Túnel de Vento):** `test-runner.js` atualizado para cobrir a Validação Estrutural do Perfil 360º (Teste 8) e o Ciclo de Vida do ATS/Email (Teste 9).
+- **Instaladores Automáticos (1-Click Bootstrapper):** Adição de scripts nativos (`Job-Inquisitor-Windows.bat` e `Job-Inquisitor-Linux-Mac.sh`) que instalam o Node.js, dependências e a IA Ollama de forma autônoma e interativa, simplificando radicalmente o onboarding do usuário final.
+- **Teste de Integração (Túnel de Vento):** `test-runner.js` atualizado para cobrir a Validação Estrutural do Perfil 360º (Teste 8), Ciclo de Vida do ATS/Email (Teste 9), Lógica de Quarentena (Teste 10) e Ghost Writer Copilot (Teste 11). Cobertura total das novas funcionalidades.
 - **Entrada Manual de Vagas:** Nova opção no CLI para registrar candidaturas feitas manualmente pelo usuário em portais bloqueados contra automação, permitindo o rastreio via E-mail.
+- **Ecossistema Open-Source:** Padronização da estrutura do repositório, criação do guia de `CONTRIBUTING.md` (com exigência de testes e regras SOLID/Anti-IA), e migração da documentação complementar para `kebab-case`.
 
 ### Alterado (Changed)
 - **Motor Heurístico Rebaixado para Fallback:** As antigas validações hardcoded de "Banco de talentos" e "PJ 1500" agora atuam como "Plano B". Se a conexão com o servidor local do Ollama falhar (ou demorar mais de 3 segundos), o sistema assume o fallback silenciosamente, garantindo a resiliência do robô.

@@ -5,6 +5,20 @@ import crypto from 'node:crypto';
  * SRP: Distinguir vagas idênticas de vagas genuinamente diferentes na mesma empresa (ex: Squads diferentes ou IDs distintos).
  */
 export class DeduplicationService {
+  constructor() {
+    this.seenHashes = new Set();
+  }
+
+  isDuplicate(job) {
+    const hash = this.generateJobHash(job);
+    return this.seenHashes.has(hash);
+  }
+
+  markAsProcessed(job) {
+    const hash = this.generateJobHash(job);
+    this.seenHashes.add(hash);
+  }
+
   /**
    * Gera um hash único baseado no Link de Destino Final ou (Empresa + Título + Localização + Código da Vaga).
    */

@@ -1,6 +1,9 @@
 import { config } from '../config/env.js';
 import { MarketDataSearchService } from './marketDataSearchService.js';
 import { SalaryBenchmarkService } from './salaryBenchmarkService.js';
+import chalk from 'chalk';
+import os from 'node:os';
+import readline from 'node:readline';
 
 /**
  * Service responsável pela avaliação de IA e geração de Relatório Ultra-Enxuto para Alta Escala (50+ candidaturas/dia).
@@ -17,6 +20,11 @@ export class LLMService {
     this.model = model;
     this.salaryBenchmarkService = salaryBenchmarkService;
     this.marketDataSearchService = marketDataSearchService;
+  }
+
+  _log(message, colorFunc = chalk.white) {
+    const time = new Date().toLocaleTimeString('pt-BR');
+    console.log(colorFunc(`[${time}] ${message}`));
   }
 
   /**
@@ -84,9 +92,9 @@ export class LLMService {
 
     // Ghost Jobs
     const ghostKeywords = ['banco de talentos', 'futuras oportunidades', 'pipeline de talentos', 'sem previsão de contratação', 'vaga afirmativa (banco)', 'cadastro reserva'];
-    let isGhost = descLower.length < 50; 
+    let isGhost = descLower.length < 50;
     let ghostReason = isGhost ? 'Descrição muito curta/vazia' : '';
-    
+
     if (!isGhost) {
       for (const kw of ghostKeywords) {
         if (descLower.includes(kw) || titleLower.includes(kw)) {
@@ -97,18 +105,18 @@ export class LLMService {
       }
     }
 
-    const ghostStatus = isToxic 
-      ? `🛑 Vaga Tóxica/Arrombada (${toxicReason})` 
-      : isGhost 
-        ? `⚠️ Suspeita de Vaga Ghost (${ghostReason})` 
+    const ghostStatus = isToxic
+      ? `🛑 Vaga Tóxica/Arrombada (${toxicReason})`
+      : isGhost
+        ? `⚠️ Suspeita de Vaga Ghost (${ghostReason})`
         : '✅ Vaga Legítima Mapeada';
 
     // Match Básico Matemático (Heurístico)
     const candidateSkills = candidateProfile?.skills || [];
     const matchedSkills = candidateSkills.filter((skill) => descLower.includes(skill.toLowerCase()));
-    const matchScore = candidateSkills.length > 0 
-        ? Math.min(100, Math.round((matchedSkills.length / Math.min(candidateSkills.length, 5)) * 100))
-        : 65;
+    const matchScore = candidateSkills.length > 0
+      ? Math.min(100, Math.round((matchedSkills.length / Math.min(candidateSkills.length, 5)) * 100))
+      : 65;
 
     return {
       matchScore,
@@ -142,9 +150,9 @@ export class LLMService {
     let aiResult;
     try {
       // PROMPT SEMÂNTICO PARA A IA COM REGRAS DE CONTEXTO
-      const persona = candidateProfile.primaryRole 
-          ? `Recrutador Sênior especializado na área de ${candidateProfile.primaryRole}`
-          : 'Especialista Sênior em Recrutamento e Seleção';
+      const persona = candidateProfile.primaryRole
+        ? `Recrutador Sênior especializado na área de ${candidateProfile.primaryRole}`
+        : 'Especialista Sênior em Recrutamento e Seleção';
 
       const prompt = `Você é um ${persona}. Analise rigorosamente a seguinte vaga para um candidato com as skills: [${(candidateProfile.skills || []).join(', ')}].
 
@@ -162,7 +170,7 @@ Responda APENAS com um objeto JSON válido contendo:
 - "isToxic": boolean (true se a cultura for tóxica ou bait-and-switch).
 - "reason": string curta (O motivo principal da sua avaliação).`;
 
-      const controllerForAi = AbortSignal.timeout(3000); // 3 segundos timeout
+      const controllerForAi = AbortSignal.timeout(30000); // 30 segundos timeout
       const response = await fetch(`${this.baseUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -171,18 +179,19 @@ Responda APENAS com um objeto JSON válido contendo:
           model: this.model,
           prompt,
           stream: false,
-          format: 'json'
+          format: 'json',
+          options: { num_thread: this._getSafeThreads(), num_gpu: 1 }
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         const parsed = JSON.parse(data.response);
-        
-        const ghostStatus = parsed.isToxic 
-          ? `🛑 Vaga Tóxica/Arrombada (${parsed.reason})` 
-          : parsed.isGhost 
-            ? `⚠️ Suspeita de Vaga Ghost (${parsed.reason})` 
+
+        const ghostStatus = parsed.isToxic
+          ? `🛑 Vaga Tóxica/Arrombada (${parsed.reason})`
+          : parsed.isGhost
+            ? `⚠️ Suspeita de Vaga Ghost (${parsed.reason})`
             : '✅ Vaga Legítima Mapeada';
 
         aiResult = {
@@ -230,6 +239,12 @@ Responda APENAS com um objeto JSON válido contendo:
     };
   }
 
+  _getSafeThreads() {
+    const totalCores = os.cpus().length;
+    // Usa 25% da capacidade (mínimo 1 thread) para não engasgar o OS
+    return Math.max(1, Math.floor(totalCores * 0.25));
+  }
+
   /**
    * Avalia o potencial do candidato com base no texto extraído do currículo.
    * Extrai senioridade, cargo principal e lista de skills (hard & soft).
@@ -237,56 +252,195 @@ Responda APENAS com um objeto JSON válido contendo:
   async analyzeCandidatePotential(resumeText) {
     if (!resumeText) throw new Error('Texto do currículo vazio.');
 
-    const prompt = `Você é um Especialista Sênior em ATS (Applicant Tracking System) e Recrutador Executivo.
-Analise o currículo fornecido e extraia um perfil detalhado do candidato.
-Retorne APENAS um objeto JSON válido, sem markdown ou explicações fora do JSON.
+    const safeThreads = this._getSafeThreads();
 
-A estrutura do JSON DEVE conter exatamente estas chaves:
-- "seniority": (string) Nível do candidato (ex: Júnior, Pleno, Sênior, Especialista).
-- "primaryRole": (string) O título profissional principal (ex: Engenheiro de Software).
-- "skills": (array de strings) As 10 a 15 principais competências técnicas e comportamentais.
-- "careerGoal": (string) Descreva o foco de carreira do candidato (é super focado em uma área ou aceita posições generalistas?).
-- "toneOfVoice": (string) Analise o estilo de escrita do currículo (Ex: Analítico, Entusiasta, Muito Formal, Direto ao ponto, etc) para a IA poder imitar a personalidade do candidato depois.
-- "atsImprovements": (array de strings) Liste 2 a 4 sugestões cruciais para melhorar o currículo visando robôs de ATS.
-- "summaries": (objeto) Contendo 5 versões do resumo profissional do candidato em primeira pessoa:
-  - "micro": (string) Tagline muito curta, máximo 100 caracteres.
-  - "short": (string) Resumo de impacto, máximo 300 caracteres.
-  - "medium": (string) Biografia profissional, máximo 1000 caracteres.
-  - "long": (string) Texto base para carta de apresentação, máximo 3000 caracteres.
-  - "extraLong": (string) Manifesto completo de carreira (tudo que tem no CV em prosa), máximo 5000 caracteres.
+    // 1. CHUNKING (Fatiamento)
+    const CHUNK_SIZE = 5000;
+    const chunks = [];
+    for (let i = 0; i < resumeText.length; i += CHUNK_SIZE) {
+      chunks.push(resumeText.substring(i, i + CHUNK_SIZE));
+    }
 
-REGRA ABSOLUTA (ANTI-IA):
-Todos os textos (resumos e manifestos) DEVEM soar 100% humanos. NUNCA use marcadores, formatação em Markdown, jargões clichês de IA (ex: "Em resumo", "Em conclusão", "Sou uma inteligência artificial") ou pontuações robóticas. Escreva como um humano de verdade.
+    this._log(`\n[OS Profiler]: CPU detectada com ${os.cpus().length} threads. Alocando de forma segura ${safeThreads} thread(s) para a IA (Baixo Consumo)...`, chalk.yellow);
+    this._log(`[Memória Otimizada]: Fatiando documento em ${chunks.length} partes para não travar o PC...`, chalk.yellow);
+    this._log(`(Dica: Pressione Ctrl+C a qualquer momento para cancelar com segurança)`, chalk.gray);
 
-Currículo:
-${resumeText.substring(0, 5000)}`;
+    // BOTÃO DE PÂNICO (Intercepta Ctrl+C para abortar graceful)
+    const panicController = new AbortController();
+    const panicButton = () => {
+      console.log(chalk.red('\n[!] CANCELAMENTO DE EMERGÊNCIA ACIONADO! (Abortando requisições...)\n'));
+      panicController.abort();
+    };
+    process.on('SIGINT', panicButton);
+
+    const partials = [];
+
+    // 2. MAP (Processamento Parcial)
+    for (let i = 0; i < chunks.length; i++) {
+      if (panicController.signal.aborted) throw new Error("Operação cancelada pelo usuário.");
+
+      let progress = 0;
+      const startTime = Date.now();
+      const progressInterval = setInterval(() => {
+        if (progress < 99) progress += 1;
+        const filled = Math.floor(progress / 5);
+        const bar = '█'.repeat(filled) + '░'.repeat(20 - filled);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+        process.stdout.write(chalk.cyan(`➜ Mastigando fatia ${i + 1}/${chunks.length} [${bar}] ${progress}% (${elapsed}s)... `));
+      }, 1000);
+
+      const partialPrompt = `Você é um Extrator de Dados. Leia a seguinte fatia de um currículo.
+Extraia e liste de forma bruta APENAS: 
+- Habilidades citadas
+- Cargos exercidos
+- Breve resumo da experiência descrita
+Seja conciso, não invente nada que não esteja no texto.
+
+Fatia:
+${chunks[i]}`;
+
+      try {
+        const fetchSignal = AbortSignal.any([
+          AbortSignal.timeout(300000), // 5 MINUTOS DE TIMEOUT
+          panicController.signal
+        ]);
+
+        const response = await fetch(`${this.baseUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: fetchSignal,
+          body: JSON.stringify({
+            model: this.model,
+            prompt: partialPrompt,
+            stream: false,
+            options: { num_thread: safeThreads, num_gpu: 1 }
+          }),
+        });
+
+        if (!response.ok) {
+          clearInterval(progressInterval);
+          const errText = await response.text();
+          console.log('\n' + chalk.red(`ERRO NA FATIA (${response.status}): ${errText}`));
+          continue; // Ignora fatia defeituosa
+        }
+
+        const data = await response.json();
+        clearInterval(progressInterval);
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+        process.stdout.write(chalk.cyan(`➜ Mastigando fatia ${i + 1}/${chunks.length} `) + chalk.green(`[████████████████████] 100% OK\n`));
+        partials.push(`[Fatia ${i + 1}]:\n${data.response}`);
+      } catch (e) {
+        clearInterval(progressInterval);
+        if (e.name === 'AbortError' && panicController.signal.aborted) throw e;
+        console.log('\n' + chalk.red(`FALHA NA REQUISIÇÃO: ${e.message}`));
+      }
+    }
+
+    if (partials.length === 0) {
+      throw new Error("Não foi possível processar nenhuma fatia do currículo.");
+    }
+
+    // 3. REDUCE (Consolidação Final)
+    console.log(chalk.yellow('\n➜ Consolidando dados extraídos (Reduce) no Perfil Final...'));
+
+    let reduceProgress = 0;
+    const reduceStartTime = Date.now();
+    const reduceInterval = setInterval(() => {
+      if (reduceProgress < 99) reduceProgress += 1;
+      const filled = Math.floor(reduceProgress / 5);
+      const bar = '█'.repeat(filled) + '░'.repeat(20 - filled);
+      const elapsed = Math.floor((Date.now() - reduceStartTime) / 1000);
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(chalk.yellow(`➜ Escrevendo Perfil [${bar}] ${reduceProgress}% (${elapsed}s)... `));
+    }, 1000);
+
+    const finalPrompt = `Você é um Recrutador Executivo.
+Eu passei o currículo do candidato por um extrator e coletei estes fragmentos de informações verdadeiras:
+
+${partials.join('\n\n')}
+
+Sua tarefa é ler as informações acima e montar o Perfil do Candidato.
+Você DEVE retornar APENAS um objeto JSON válido, sem nenhum texto antes ou depois.
+
+Regras de Ouro (CUMPRIMENTO OBRIGATÓRIO):
+1. O texto DEVE ser escrito na PRIMEIRA PESSOA DO SINGULAR (ex: "Eu sou...", "Tenho experiência...").
+2. NUNCA invente habilidades ou senioridades que não estejam no texto.
+3. NÃO COPIE o exemplo abaixo. O exemplo abaixo é de um Engenheiro de Software genérico. Você DEVE usar os dados REAIS do currículo fornecido.
+
+Siga EXATAMENTE a ESTRUTURA deste JSON. Substitua a palavra "string" pelo conteúdo real gerado por você.
+ATENÇÃO: NÃO copie exemplos. Gere 100% do texto baseado nos dados do candidato.
+
+{
+  "seniority": "string (Júnior, Pleno ou Sênior)",
+  "primaryRole": "string (Cargo principal deduzido do texto)",
+  "skills": ["string (Habilidade 1)", "string (Habilidade 2)", "string (Habilidade 3)"],
+  "careerGoal": "string (Resumo do objetivo profissional)",
+  "toneOfVoice": "string (Tom de voz utilizado, ex: Profissional)",
+  "atsImprovements": ["string (Sugestão de melhoria 1)", "string (Sugestão de melhoria 2)"],
+  "summaries": {
+    "micro": "string (Resumo de 1 frase na 1ª pessoa)",
+    "short": "string (Resumo de 1 parágrafo na 1ª pessoa)",
+    "medium": "string (Resumo de 2 parágrafos na 1ª pessoa)",
+    "long": "string (Texto longo detalhando experiências na 1ª pessoa)",
+    "extraLong": "string (História completa da carreira, sem tópicos, 1ª pessoa)"
+  }
+}`;
 
     try {
-      const controllerForAi = AbortSignal.timeout(20000); // 20 segundos pois a geração de texto longo demora mais
+      if (panicController.signal.aborted) throw new Error("Operação cancelada pelo usuário.");
+
+      const fetchSignal = AbortSignal.any([
+        AbortSignal.timeout(600000), // 10 MINUTOS DE TIMEOUT NO REDUCE
+        panicController.signal
+      ]);
+
       const response = await fetch(`${this.baseUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: controllerForAi,
+        signal: fetchSignal,
         body: JSON.stringify({
           model: this.model,
-          prompt,
+          prompt: finalPrompt,
           stream: false,
-          format: 'json'
+          format: 'json',
+          options: { num_thread: safeThreads, num_gpu: 1 }
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return JSON.parse(data.response);
+      if (!response.ok) {
+        clearInterval(reduceInterval);
+        const errText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errText}`);
       }
+
+      const data = await response.json();
+      clearInterval(reduceInterval);
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(chalk.yellow(`➜ Escrevendo Perfil `) + chalk.green(`[████████████████████] 100% OK\n\n`));
+
+      return JSON.parse(data.response);
     } catch (error) {
-      console.warn('⚠️  [Aviso]: IA Local (Ollama) offline ou timeout. Usando motor Heurístico de Fallback para extração de perfil.');
+      clearInterval(reduceInterval);
+      if (error.name === 'AbortError' && panicController.signal.aborted) {
+        throw new Error("Operação abortada com segurança.");
+      }
+      console.log('\n' + chalk.bgRed.white(' ERRO NA INTELIGÊNCIA ARTIFICIAL '));
+      console.log(chalk.red(`Falha na consolidação do Perfil: ${error.message}`));
+      console.log(chalk.yellow('O sistema não conseguiu gerar seu perfil e foi forçado a usar o Modo Heurístico Genérico.\n'));
+    } finally {
+      // Remove o interceptador de SIGINT para que o botão Sair volte ao normal
+      process.off('SIGINT', panicButton);
     }
 
     // FALLBACK DE SEGURANÇA (Caso IA falhe)
     const textLower = resumeText.toLowerCase();
-    
-    let seniority = 'Pleno'; 
+
+    let seniority = 'Pleno';
     if (textLower.includes('senior') || textLower.includes('sênior') || textLower.includes('especialista') || textLower.includes('tech lead')) {
       seniority = 'Sênior';
     } else if (textLower.includes('junior') || textLower.includes('júnior') || textLower.includes('estagiário')) {
@@ -356,10 +510,11 @@ RESPOSTA (Apenas o texto final):`;
       if (response.ok) {
         const data = await response.json();
         return data.response.trim();
+      } else {
+        throw new Error('Falha na resposta da API Ollama');
       }
     } catch (error) {
       return "(⚠️ O Motor da IA [Ollama] parece estar offline. Ligue-o para utilizar o Copiloto de Chat!)";
     }
   }
 }
-
