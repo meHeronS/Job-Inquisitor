@@ -25,6 +25,16 @@ export function runDirectoryCleanup() {
       }
     }
   });
+
+  // Limpeza de arquivo legado fora da pasta data/db/
+  const legacyAppJson = path.join(rootDir, 'data/applications.json');
+  if (fs.existsSync(legacyAppJson)) {
+    try {
+      fs.unlinkSync(legacyAppJson);
+    } catch {
+      // Ignora erro se estiver em uso
+    }
+  }
 }
 
 // Executar na inicialização
