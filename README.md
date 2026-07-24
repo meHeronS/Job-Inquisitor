@@ -1,8 +1,36 @@
 # Job Inquisitor 🕵️‍♂️
 
+```text
+      _       _       ___                  _     _ _
+     | | ___ | |__   |_ _|_ __   __ _ _   _(_)___(_) |_ ___  __
+  _  | |/ _ \| '_ \   | || '_ \ / _` | | | | / __| | __/ _ \| '__|
+ | |_| | (_) | |_) |  | || | | | (_| | |_| | \__ \ | || (_) | |
+  \___/ \___/|_.__/  |___|_| |_|\__, |\__,_|_|___/_|\__\___/|_|
+                                   |_|
+     .----.
+    /  _   \   Copiloto de Vagas Automático
+   |  ( )   |  "Buscando as melhores oportunidades..."
+    \      /
+     '----'
+       \ \
+        \_\
+```
+
 > **Investigador & Copiloto de Vagas Automático Universal** - Ferramenta open-source universal, **100% GRATUITA**, compatível com **Linux, Windows e macOS**, com relatórios ultra-enxutos otimizados para aplicação em massa (50+ candidaturas/dia), criptografia militar PBKDF2 + AES-256-GCM com chave derivada de hardware, baixo consumo de RAM/CPU (< 1.2 GB RAM), suporte a Google One-Tap e Microsoft Outlook OAuth 2.0, busca em 12 portais + "Trabalhe Conosco" direto para **qualquer área profissional**.
 > 
-> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.2` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md)
+> **Criado por:** Heron Silva ([@meherons](https://github.com/meherons)) | **Versão:** `v1.0.3` ([CHANGELOG](CHANGELOG.md)) | **Licença:** [MIT](LICENSE) | **Arquitetura SDLC:** [ARCHITECTURE_SDLC.md](docs/ARCHITECTURE_SDLC.md)
+
+---
+
+## Principais Recursos e Diferenciais Técnicos
+
+Além da raspagem e automação tradicionais, o Job Inquisitor implementa um ciclo de vida completo para o candidato através de ferramentas integradas:
+
+- 🧠 **Análise Semântica (LLM Local):** Integração com modelos locais (ex: Ollama) para interpretar o contexto de vagas. O motor avalia o alinhamento de perfil e identifica culturas organizacionais tóxicas (baseado em red flags textuais).
+- 🗂️ **Rastreamento de Candidaturas (ATS Local):** Persistência automatizada do ciclo de vida das candidaturas (`data/applications.json`). O sistema sincroniza o status cruzando respostas recebidas por e-mail.
+- ☢️ **Sistema de Quarentena de Falsos Positivos:** Vagas bloqueadas pelos filtros de segurança são alocadas em uma Quarentena que permite revisão e anulação (override) humana via CLI.
+- 💬 **Assistente de Formulários (CLI Copilot):** Módulo interativo no terminal (Chat) que auxilia no preenchimento manual de plataformas complexas. A IA utiliza os dados extraídos do currículo e o tom de voz identificado para formular respostas personalizadas.
+- 🩻 **Geração de Perfil de Candidato Estruturado:** Processamento de currículos em PDF para gerar resumos de 5 comprimentos distintos e sugerir otimizações de formato ATS (`atsImprovements`).
 
 ---
 
@@ -102,9 +130,11 @@ Job-Inquisitor/
 │   ├── resumes/              # Seus currículos reais em PDF
 │   ├── letters/              # Cartas de apresentação em PDF
 │   ├── sessions/             # Tokens OAuth e sessão do navegador (session_state.json)
+│   ├── profile.json          # Clone digital 360º do seu perfil gerado pela IA
 │   └── GIT_BRANCHING_GUIDE.md# 🌿 Seu Guia de Estudo Local de Branches
 ├── data/                     # 🗄️ [GIT-IGNORED] BANCO DE DADOS & RELATÓRIOS DO SISTEMA
-│   ├── db/                   # Arquivo do Banco Local (job_inquisitor_db.json)
+│   ├── db/                   # Arquivo do Banco Local legado
+│   ├── applications.json     # Banco de Dados Kanban do ATS (Seu Trello de Vagas)
 │   └── reports/              # Relatório exportado da Lista VIP (LISTA_VIP_VAGAS.md)
 ├── docs/                     # 📖 DOCUMENTAÇÃO PÚBLICA DO REPOSITÓRIO GITHUB
 │   ├── ARCHITECTURE_SDLC.md # 🏛️ Guia Técnico de Arquitetura & Disciplinas da Ciência da Computação

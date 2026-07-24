@@ -47,6 +47,15 @@ Este documento detalha **onde, como e por que** cada grande disciplina da Ciênc
 
 ---
 
+## 🏗️ 3.1. Evolução IHC e GUI Nativa
+
+### 💡 Por que foi aplicado e qual o problema resolve?
+- **A Solução de IHC (Interação Humano-Computador) e Prontidão para GUI Nativa:**
+  A arquitetura do projeto foi desenhada visando extrema resiliência e **Desacoplamento de Interface**. Atualmente, o projeto utiliza uma interface de linha de comando (CLI) baseada em Prompts interativos (Inquirer.js). No entanto, como todos os módulos de negócios residem em `src/services/` e a orquestração no `JobController`, a arquitetura garante **zero acoplamento** entre a lógica e a interface gráfica.
+  - **Preparação para Desktop:** O sistema está arquiteturalmente pronto para receber invólucros desktop cross-platform (como **Electron** ou **Tauri**) no futuro. Basta substituir o `src/cli/index.js` por uma camada de comunicação IPC (Inter-Process Communication), transformando a aplicação em um executável nativo (.exe / .AppImage) acessível a usuários com baixa familiaridade técnica (ex: advogados, enfermeiros), mantendo o ecossistema Node.js intacto.
+
+---
+
 ## 🔒 4. Segurança da Informação & DevSecOps
 
 ### 📍 Onde foi aplicado:

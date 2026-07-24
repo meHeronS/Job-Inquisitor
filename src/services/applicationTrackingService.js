@@ -82,6 +82,47 @@ export class ApplicationTrackingService {
   }
 
   /**
+   * Retorna candidaturas em Quarentena.
+   */
+  async getQuarantinedApplications() {
+    const db = await this._readDB();
+    return db.filter(app => app.status === 'Quarentena');
+  }
+
+  /**
+   * Atualiza status pelo ID (Usado no override da Quarentena).
+   */
+  async updateStatusById(jobId, newStatus, reason = '') {
+    const db = await this._readDB();
+    let updated = false;
+    for (const app of db) {
+      if (app.id === jobId) {
+        app.status = newStatus;
+        app.history.push({ status: newStatus, reason, timestamp: new Date().toISOString() });
+        updated = true;
+        break;
+      }
+    }
+    if (updated) await this._writeDB(db);
+    return updated;
+  }
+
+  /**
+   * Deleta uma candidatura fisicamente do banco de dados.
+   */
+  async deleteApplication(jobId) {
+    let db = await this._readDB();
+    const initialLength = db.length;
+    db = db.filter(app => app.id !== jobId);
+    
+    if (db.length !== initialLength) {
+      await this._writeDB(db);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Retorna as candidaturas agrupadas por status.
    */
   async getPipelineMetrics() {

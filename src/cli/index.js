@@ -41,6 +41,7 @@ async function runCLI() {
         { name: '🕵️‍♂️  Iniciar Investigação Automática (Caçar Vagas)', value: 'hunt' },
         { name: '💬  Chat: Copiloto Interativo (Ajuda com Formulários)', value: 'chat' },
         { name: '📝  Registrar Candidatura Manual (Para Rastreio)', value: 'manual' },
+        { name: '☢️  Revisar Vagas na Quarentena (Prevenir Falsos Positivos)', value: 'quarantine' },
         { name: '📩  Sincronizar E-mails e Status de Vagas (Gmail / Outlook)', value: 'email' },
         { name: '🤖  Gerar Perfil de Candidato (Extrair do PDF)', value: 'profile' },
         { name: '📊  Ver Relatório VIP', value: 'report' },
@@ -97,6 +98,45 @@ async function runCLI() {
         company: manualJob.company
       });
       console.log(chalk.green(`\n[Sucesso]: Vaga da ${manualJob.company} registrada como "Aguardando Retorno"! O EmailService vai monitorar respostas para ela.\n`));
+      break;
+
+    case 'quarantine':
+      console.log(chalk.yellow('\n[Quarentena]: Buscando vagas bloqueadas pela Inteligência Artificial...'));
+      const quarantined = await controller.applicationTrackingService.getQuarantinedApplications();
+      
+      if (quarantined.length === 0) {
+        console.log(chalk.green('A Quarentena está vazia! Nenhuma vaga suspeita retida.'));
+        break;
+      }
+
+      const qChoices = quarantined.map(q => ({
+        name: `[${q.company}] ${q.title} - Motivo: ${q.history[0]?.reason || 'Desconhecido'}`,
+        value: q.id
+      }));
+      qChoices.push({ name: 'Voltar ao Menu', value: 'voltar' });
+
+      const { selectedQ } = await inquirer.prompt([{
+        type: 'list', name: 'selectedQ', message: 'Selecione uma vaga para revisar:', choices: qChoices
+      }]);
+
+      if (selectedQ === 'voltar') break;
+
+      const { qAction } = await inquirer.prompt([{
+        type: 'list', name: 'qAction', message: 'Qual é o seu Veredito Final?',
+        choices: [
+          { name: '✅ A IA Errou (Falso Positivo): Aprovar vaga e rastrear candidaturas.', value: 'approve' },
+          { name: '🗑️  A IA Acertou: Excluir vaga definitivamente.', value: 'delete' },
+          { name: '⬅️  Deixar na Quarentena por enquanto', value: 'keep' }
+        ]
+      }]);
+
+      if (qAction === 'approve') {
+        await controller.applicationTrackingService.updateStatusById(selectedQ, 'Aguardando Retorno', 'Anulado por intervenção humana (Falso Positivo)');
+        console.log(chalk.green('\nVaga resgatada com sucesso! Ela foi movida para "Aguardando Retorno".\n'));
+      } else if (qAction === 'delete') {
+        await controller.applicationTrackingService.deleteApplication(selectedQ);
+        console.log(chalk.red('\nVaga destruída permanentemente.\n'));
+      }
       break;
 
     case 'email':
