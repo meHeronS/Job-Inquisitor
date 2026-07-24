@@ -15,6 +15,7 @@ import { SecurityCryptoService } from '../services/securityCryptoService.js';
 import { SessionManagerService } from '../services/sessionManagerService.js';
 import { ApplicationTrackingService } from '../services/applicationTrackingService.js';
 import { runDirectoryCleanup } from '../utils/cleanup.js';
+import chalk from 'chalk';
 
 /**
  * Controller de Orquestração das operações de Vagas, Criptografia AES-256, Exportação VIP, Deduplicação, Form Autocompletion e IA Local.
@@ -81,60 +82,63 @@ export class JobController {
   }
 
   async exportVipReport(evaluatedJobs) {
-    return await this.reportExportService.exportVipListToMarkdown(evaluatedJobs);
+    return await this.refreshAllReports();
   }
 
-  getDirectCompanyCareerPages() {
-    return this.companyCareerPageService.getTargetCompanies();
+  async refreshAllReports() {
+    const vipJobs = await this.applicationTrackingService.getAllApplications();
+    const quarJobs = await this.applicationTrackingService.getQuarantinedApplications();
+    const ignJobs = await this.applicationTrackingService.getIgnoredApplications();
+
+    await this.reportExportService.exportVipListToMarkdown(vipJobs);
+    await this.reportExportService.exportQuarantineListToMarkdown(quarJobs);
+    await this.reportExportService.exportIgnoredListToMarkdown(ignJobs);
   }
 
-  processFormAutofill(detectedFields, candidateProfile) {
-    return this.formAutofillService.classifyFormFields(detectedFields, candidateProfile);
-  }
+  async searchAndEvaluateJobs(query, location, candidateProfile, limit = 50, abortSignal) {
+    const evaluatedJobs = [];
 
-  getPipelineMetrics(jobsList) {
-    return this.pipelineMetricsService.calculateMetrics(jobsList);
-  }
+    // Carrega histórico COMPLETO de todos os bancos em data/db/ para a Deduplicação (Instantânea)
+    const pastJobs = await this.applicationTrackingService.getAllHistoricJobs();
+    for (const pastJob of pastJobs) {
+      this.deduplicationService.markAsProcessed(pastJob);
+    }
 
-  getSsoSessionConfig() {
-    return this.sessionManagerService.getSsoLoginInstructions();
-  }
+    console.log(chalk.cyan(`\n[JobController] Histórico de ${pastJobs.length} vagas carregado. Iniciando busca e avaliação contínua...`));
 
-  async fetchLiveMarketSalary(company, role) {
-    return await this.marketDataSearchService.fetchLiveMarketSalary(company, role);
-  }
+    for await (const job of this.scrapingService.scrapeJobsGenerator(query, location, limit, abortSignal)) {
+      if (abortSignal && abortSignal.aborted) break;
 
-  async syncLinkedInProfile(profileUrl, optionalPdfPath) {
-    return await this.linkedInProfileService.getCandidateProfileFromLinkedIn(profileUrl, optionalPdfPath);
-  }
+      // Deduplicação em tempo real
+      const isDuplicate = this.deduplicationService.isDuplicate(job);
+      if (isDuplicate) {
+        process.stdout.write(chalk.gray(`\n⏭️  [Deduplicado] Pulando vaga já verificada anteriormente: ${job.title} @ ${job.company}`));
+        continue;
+      }
+      this.deduplicationService.markAsProcessed(job);
 
-  calculateCltToPj(cltAmount) {
-    return this.salaryBenchmarkService.convertCltToPj(cltAmount);
-  }
+      process.stdout.write(chalk.blue(`\n🤖 [IA] Avaliando: ${job.title} @ ${job.company}... `));
 
-  applySalaryGuardrails(candidateBaseFloor, rawCalculatedValue, contractType) {
-    return this.salaryBenchmarkService.applyRealisticSalaryGuardrails(candidateBaseFloor, rawCalculatedValue, contractType);
-  }
+      // Inteligência Artificial
+      const match = await this.llmService.evaluateJobDynamicSalaryAndMatch(candidateProfile, job);
+      const fullJob = { ...job, ...match };
+      
+      if (fullJob.verdict === 'Candidatar') {
+         process.stdout.write(chalk.green(`✅ Aprovada (${fullJob.matchScore}% Match) -> Adicionada à Lista VIP!`));
+         await this.applicationTrackingService.trackApplication(fullJob, 'Nova Vaga');
+      } else if (fullJob.verdict === 'Quarentena' || fullJob.isQuarantine) {
+         process.stdout.write(chalk.yellow(`☢️ Retida em Quarentena (${fullJob.matchScore}% Match)`));
+         await this.applicationTrackingService.trackApplication(fullJob, 'Quarentena');
+      } else {
+         process.stdout.write(chalk.red(`❌ Descartada (${fullJob.matchScore}% Match)`));
+         await this.applicationTrackingService.trackApplication(fullJob, 'Ignorado');
+      }
 
-  async readResumePdf(filePath) {
-    return await this.pdfReaderService.extractText(filePath);
-  }
+      evaluatedJobs.push(fullJob);
 
-  async evaluateCandidatePotential(resumeText) {
-    return await this.llmService.analyzeCandidatePotential(resumeText);
-  }
-
-  async searchAndEvaluateJobs(query, location, candidateProfile) {
-    const scrapedJobs = await this.scrapingService.scrapeJobs(query, location);
-    const uniqueJobs = this.deduplicateJobs(scrapedJobs);
-
-    const evaluatedJobs = uniqueJobs.map((job) => {
-      const match = this.matchService.evaluateMatch(candidateProfile, job);
-      return {
-        ...job,
-        ...match,
-      };
-    });
+      // Atualiza os 3 arquivos Markdown em data/reports/ em tempo real
+      await this.refreshAllReports();
+    }
 
     return evaluatedJobs;
   }
