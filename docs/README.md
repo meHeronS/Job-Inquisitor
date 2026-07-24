@@ -1,4 +1,4 @@
-# Documentação do Repositório Job-Seek
+# Documentação do Repositório Job Inquisitor 🕵️‍♂️
 
 Esta pasta contém as documentações públicas do repositório:
 

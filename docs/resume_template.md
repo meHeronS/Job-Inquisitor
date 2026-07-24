@@ -1,25 +1,22 @@
-# Modelo de Currículo Base (Exemplo Público)
+# Modelo de Currículo Base (Exemplo Público - Job Inquisitor 🕵️‍♂️)
 
 > Este arquivo é um modelo de exemplo público disponibilizado no repositório.
-> Seus currículos reais e cartas de apresentação com dados sensíveis devem ser salvos na pasta `docs/private/` (que é totalmente ignorada pelo Git e protegida contra envios ao GitHub).
+> Seus currículos reais e cartas de apresentação com dados sensíveis devem ser salvos na pasta **`user_data/resumes/`** e **`user_data/letters/`** (100% protegidas e ignoradas pelo Git).
 
 ---
 
 ## 👤 Nome do Candidato
-- **Cargo Alvo:** Desenvolvedor Full-Stack / Backend Node.js
-- **Nível:** Júnior a Pleno
-- **Localização:** Brasil (Remoto)
+- **Cargo Alvo:** Especialista / Analista / Gestor / Desenvolvedor
+- **Nível:** Júnior, Pleno, Sênior ou Especialista
+- **Localização:** Brasil (Remoto / Presencial / Híbrido)
 
-## 🛠️ Habilidades Técnicas
-- **Linguagens & Runtimes:** JavaScript (ES6+), TypeScript, Node.js (v22+)
-- **Databases:** MongoDB, Redis
-- **Automação & RPA:** Playwright, Puppeteer, BullMQ
-- **Arquitetura & Boas Práticas:** Clean Code, SOLID, TDD, ES Modules, Docker
+## 🛠️ Habilidades & Diferenciais
+- **Competências Principais:** Gestão de Projetos, Análise de Dados, Atendimento, Desenvolvimento, Didática, etc.
+- **Ferramentas & Tecnologias:** Planilhas, ERPs, Sistemas de TI, Frameworks ou Metodologias Ágeis.
 
 ## 💼 Experiência Profissional
-### Desenvolvedor de Software (Projetos / Freelance)
-- Desenvolvimento de automações RPA e crawlers para raspagem de dados.
-- Construção de APIs e sistemas CLI estruturados em arquitetura passiva e desacoplada.
+### Cargo / Função (Empresa Anterior)
+- Descrição de projetos executados, resultados alcançados e responsabilidades principais.
 
 ## 🎓 Formação Acadêmica
-- Bacharelado / Tecnólogo em TI ou áreas correlatas.
+- Graduação / Pós-Graduação / Cursos de Especialização.
